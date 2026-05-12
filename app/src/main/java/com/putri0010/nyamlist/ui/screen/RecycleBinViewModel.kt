@@ -16,10 +16,4 @@ class RecycleBinViewModel(
             dao.restoreWishlist(id)
         }
     }
-
-    fun deletePermanent(id: Long) {
-        viewModelScope.launch {
-            dao.deletePermanent(id)
-        }
-    }
 }

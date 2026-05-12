@@ -27,7 +27,7 @@ abstract class WishlistDb : RoomDatabase() {
                         WishlistDb::class.java,
                         "wishlist.db"
                     )
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration(false)
                     .build()
                     INSTANCE = instance
                 }
