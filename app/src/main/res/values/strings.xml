@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">NyamList</string>
+    <string name="list_kosong">Buat Wishlist kulinermu!!</string>
+    <string name="x_diklik">%1$s diklik!</string>
+    <string name="tambah_wishlist">Tambah Wishlist</string>
+    <string name="kota">Kota</string>
+    <string name="makanan">Nama Makanan</string>
+    <string name="resto">Nama Restoran</string>
+    <string name="status">Status</string>
+    <string name="kembali">Kembali</string>
+    <string name="simpan">Simpan</string>
+    <string name="edit_wishlist">Ubah Wishlist</string>
+    <string name="invalid">Kota dan makanan tidak boleh kosong.</string>
+    <string name="lainnya">Opsi lainnya</string>
+    <string name="hapus">Hapus Wishlist</string>
+    <string name="pesan_hapus">Hapus wishlist ini?</string>
+    <string name="tombol_hapus">Hapus</string>
+    <string name="tombol_batal">Batal</string>
+    <string name="list">Tampilan list</string>
+    <string name="grid">Tampilan grid</string>
 </resources>
