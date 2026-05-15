@@ -1,5 +1,7 @@
 package com.putri0010.nyamlist.ui.screen
 
+import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,11 +35,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.putri0010.nyamlist.ui.theme.Cream
+import com.putri0010.nyamlist.ui.theme.NyamListTheme
+import com.putri0010.nyamlist.ui.theme.Orange
 import com.putri0010.nyamlist.util.ViewModelFactory
 
+@Preview(showBackground = true)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Composable
+fun RecycleBinScreenPreview() {
+
+    NyamListTheme {
+        RecycleBinScreen(rememberNavController())
+    }
+}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecycleBinScreen(
@@ -45,43 +61,37 @@ fun RecycleBinScreen(
 ) {
 
     val context = LocalContext.current
-
     val factory = ViewModelFactory(context)
-
     val viewModel: RecycleBinViewModel =
         viewModel(factory = factory)
-
     val data by viewModel.data.collectAsState(initial = emptyList())
 
     Scaffold(
-
         topBar = {
-
             TopAppBar(
-
                 navigationIcon = {
-
                     IconButton(
                         onClick = {
                             navController.popBackStack()
                         }
                     ) {
-
                         Icon(
                             imageVector =
                                 Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null
+                            contentDescription = null,
+                            tint = Cream
                         )
                     }
                 },
-
                 title = {
-                    Text("Recycle Bin")
+                    Text(
+                        "Recycle Bin",
+                        fontWeight = FontWeight.Bold
+                    )
                 },
-
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor =
-                        MaterialTheme.colorScheme.primaryContainer
+                    containerColor = Orange,
+                    titleContentColor = Cream
                 )
             )
         }
@@ -106,7 +116,7 @@ fun RecycleBinScreen(
                 ) {
 
                     Box(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth().background(Cream)
                     )  {
 
                         Column(
@@ -119,7 +129,8 @@ fun RecycleBinScreen(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
                                     imageVector = Icons.Default.LocationOn,
-                                    contentDescription = "Kota"
+                                    contentDescription = "Kota",
+                                    tint = Orange
                                 )
 
                                 Text(
@@ -127,44 +138,51 @@ fun RecycleBinScreen(
                                     fontWeight = FontWeight.Bold,
                                     modifier = Modifier.padding(start = 8.dp),
                                     maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = Orange
                                 )
                             }
 
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
                                     imageVector = Icons.Default.Fastfood,
-                                    contentDescription = "Makanan"
+                                    contentDescription = "Makanan",
+                                    tint = Orange
                                 )
 
                                 Text(
                                     text = wishlist.makanan,
                                     modifier = Modifier.padding(start = 8.dp),
                                     maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = Orange
                                 )
                             }
 
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
                                     imageVector = Icons.Default.RestaurantMenu,
-                                    contentDescription = "Resto"
+                                    contentDescription = "Resto",
+                                    tint = Orange
                                 )
 
                                 Text(
                                     text = wishlist.resto,
                                     modifier = Modifier.padding(start = 8.dp),
                                     maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = Orange
                                 )
                             }
-
-                            Text(text = wishlist.status)
-
+                            Text(
+                                text = wishlist.status,
+                                color = Orange
+                            )
                             Text(
                                 text = wishlist.tanggal,
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                overflow = TextOverflow.Ellipsis,
+                                color = Orange
                             )
                         }
 
@@ -176,7 +194,8 @@ fun RecycleBinScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.Restore,
-                                contentDescription = "Restore"
+                                contentDescription = "Restore",
+                                tint = Orange
                             )
                         }
                     }

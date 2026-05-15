@@ -7,8 +7,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.putri0010.nyamlist.ui.theme.NyamListTheme
 import com.putri0010.nyamlist.R
+import com.putri0010.nyamlist.ui.theme.Cream
+import com.putri0010.nyamlist.ui.theme.NyamListTheme
+import com.putri0010.nyamlist.ui.theme.Orange
 
 
 @Preview(showBackground = true)
@@ -28,15 +30,26 @@ fun DisplayAlertDialog(
     onConfirmation: () -> Unit
 ) {
     AlertDialog(
-        text = { Text(text = stringResource(R.string.pesan_hapus)) },
+        containerColor = Cream,
+        text = {
+            Text(
+                text = stringResource(R.string.pesan_hapus),
+                color = Orange
+            )
+        },
         confirmButton = {
             TextButton(onClick = { onConfirmation() }) {
-                Text(text = stringResource(R.string.tombol_hapus))
+                Text(text = stringResource(R.string.tombol_hapus),
+                    color = Orange
+                )
             }
         },
         dismissButton = {
             TextButton(onClick = {onDismissRequest() }) {
-                Text(text = stringResource(R.string.tombol_batal))
+                Text(
+                    text = stringResource(R.string.tombol_batal),
+                    color = Orange
+                )
             }
         },
         onDismissRequest = { onDismissRequest() }

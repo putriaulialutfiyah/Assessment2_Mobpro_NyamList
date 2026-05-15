@@ -52,7 +52,9 @@ import androidx.navigation.compose.rememberNavController
 import com.putri0010.nyamlist.R
 import com.putri0010.nyamlist.model.Wishlist
 import com.putri0010.nyamlist.navigation.Screen
+import com.putri0010.nyamlist.ui.theme.Cream
 import com.putri0010.nyamlist.ui.theme.NyamListTheme
+import com.putri0010.nyamlist.ui.theme.Orange
 import com.putri0010.nyamlist.util.SettingsDataStore
 import com.putri0010.nyamlist.util.ViewModelFactory
 import kotlinx.coroutines.CoroutineScope
@@ -80,11 +82,14 @@ fun MainScreen(navController: NavHostController) {
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = stringResource(id = R.string.app_name))
+                    Text(
+                        text = stringResource(id = R.string.app_name),
+                        fontWeight = FontWeight.Bold
+                    )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary
+                    containerColor = Orange,
+                    titleContentColor = Cream
                 ),
                 actions = {
                     IconButton(
@@ -107,7 +112,7 @@ fun MainScreen(navController: NavHostController) {
                                 else
                                     R.string.list
                             ),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = Cream
                         )
                     }
                     IconButton(
@@ -122,7 +127,8 @@ fun MainScreen(navController: NavHostController) {
                             painter = painterResource(
                                 R.drawable.outline_delete_24
                             ),
-                            contentDescription = "Recycle Bin"
+                            contentDescription = "Recycle Bin",
+                            tint = Cream
                         )
                     }
                 }
@@ -134,12 +140,13 @@ fun MainScreen(navController: NavHostController) {
             FloatingActionButton(
                 onClick = {
                     navController.navigate(Screen.FormBaru.route)
-                }
+                },
+                containerColor = Orange
             ) {
-
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.tambah_wishlist)
+                    contentDescription = stringResource(R.string.tambah_wishlist),
+                    tint = Cream
                 )
             }
         }
@@ -162,11 +169,8 @@ fun ScreenContent(
 ) {
 
     val context = LocalContext.current
-
     val factory = ViewModelFactory(context)
-
     val viewModel: MainViewModel = viewModel(factory = factory)
-
     val data by viewModel.data.collectAsState()
 
     if (data.isEmpty()) {
@@ -175,68 +179,51 @@ fun ScreenContent(
             modifier = modifier
                 .fillMaxSize()
                 .padding(16.dp),
-
             verticalArrangement = Arrangement.Center
         ) {
             Text(
                 text = stringResource(R.string.list_kosong),
                 modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = Orange
             )
         }
 
     } else {
-
         if (showList) {
-
             LazyColumn(
                 modifier = modifier.fillMaxSize(),
 
                 contentPadding = PaddingValues(bottom = 84.dp)
             ) {
-
                 items(data) {
-
                     ListItem(
                         wishlist = it
                     ) {
-
                         navController.navigate(
                             Screen.FormUbah.withId(it.id)
                         )
                     }
-
                     HorizontalDivider()
                 }
             }
-
         } else {
-
             LazyVerticalStaggeredGrid(
-
                 modifier = modifier.fillMaxSize(),
-
                 columns = StaggeredGridCells.Fixed(2),
-
                 verticalItemSpacing = 8.dp,
-
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-
                 contentPadding = PaddingValues(
                     8.dp,
                     8.dp,
                     8.dp,
                     84.dp
                 )
-
             ) {
-
                 items(data) {
-
                     GridItem(
                         wishlist = it
                     ) {
-
                         navController.navigate(
                             Screen.FormUbah.withId(it.id)
                         )
@@ -252,16 +239,14 @@ fun ListItem(
     wishlist: Wishlist,
     onClick: () -> Unit
 ) {
-
     Card(
-
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .clickable { onClick() },
 
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = Cream
         ),
 
         border = BorderStroke(
@@ -276,47 +261,55 @@ fun ListItem(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.LocationOn,
-                    contentDescription = "Kota"
+                    contentDescription = "Kota",
+                    tint = Orange
                 )
                 Text(
                     text = wishlist.kota,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(start = 8.dp),
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = Orange
                 )
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.Fastfood,
-                    contentDescription = "Makanan"
+                    contentDescription = "Makanan",
+                    tint = Orange
                 )
                 Text(
                     text = wishlist.makanan,
                     modifier = Modifier.padding(start = 8.dp),
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = Orange
                 )
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.RestaurantMenu,
-                    contentDescription = "Resto"
+                    contentDescription = "Resto",
+                    tint = Orange
                 )
                 Text(
                     text = wishlist.resto,
                     modifier = Modifier.padding(start = 8.dp),
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = Orange
                 )
             }
             Text(
-                text = wishlist.status
+                text = wishlist.status,
+                color = Orange
             )
             Text(
                 text = wishlist.tanggal,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                color = Orange
             )
         }
     }
@@ -333,7 +326,7 @@ fun GridItem(
             .clickable { onClick() },
 
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = Cream
         ),
 
         border = BorderStroke(
@@ -348,47 +341,55 @@ fun GridItem(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.LocationOn,
-                    contentDescription = "Kota"
+                    contentDescription = "Kota",
+                    tint = Orange
                 )
                 Text(
                     text = wishlist.kota,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(start = 8.dp),
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = Orange
                 )
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.Fastfood,
-                    contentDescription = "Makanan"
+                    contentDescription = "Makanan",
+                    tint = Orange
                 )
                 Text(
                     text = wishlist.makanan,
                     modifier = Modifier.padding(start = 8.dp),
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = Orange
                 )
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.RestaurantMenu,
-                    contentDescription = "Resto"
+                    contentDescription = "Resto",
+                    tint = Orange
                 )
                 Text(
                     text = wishlist.resto,
                     modifier = Modifier.padding(start = 8.dp),
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = Orange
                 )
             }
             Text(
-                text = wishlist.status
+                text = wishlist.status,
+                color = Orange
             )
             Text(
                 text = wishlist.tanggal,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                color = Orange
             )
         }
     }

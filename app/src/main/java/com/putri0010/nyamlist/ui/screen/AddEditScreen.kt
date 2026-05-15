@@ -2,6 +2,7 @@ package com.putri0010.nyamlist.ui.screen
 
 import android.content.res.Configuration
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -22,7 +24,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -38,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,7 +51,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.putri0010.nyamlist.R
+import com.putri0010.nyamlist.ui.theme.Cream
 import com.putri0010.nyamlist.ui.theme.NyamListTheme
+import com.putri0010.nyamlist.ui.theme.Orange
 import com.putri0010.nyamlist.util.ViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,19 +86,25 @@ fun AddEditScreen(navController: NavHostController, id: Long? = null) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.kembali),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = Cream
                         )
                     }
                 },
                 title = {
                     if (id == null)
-                        Text(text = stringResource(id = R.string.tambah_wishlist))
+                        Text(
+                            text = stringResource(id = R.string.tambah_wishlist),
+                            fontWeight = FontWeight.Bold
+                        )
                     else
-                        Text(text = stringResource(id = R.string.edit_wishlist))
+                        Text(
+                            text = stringResource(id = R.string.edit_wishlist),
+                            fontWeight = FontWeight.Bold
+                        )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    containerColor = Orange,
+                    titleContentColor = Cream,
                 ),
                 actions = {
                     IconButton(onClick = {
@@ -109,7 +122,7 @@ fun AddEditScreen(navController: NavHostController, id: Long? = null) {
                         Icon(
                             imageVector = Icons.Outlined.Check,
                             contentDescription = stringResource(R.string.simpan),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = Cream
                         )
                     }
                     if (id != null) {
@@ -186,34 +199,69 @@ fun FormWislist(
         OutlinedTextField(
             value = city,
             onValueChange = { onCityChange(it) },
-            label = { Text(text = stringResource(R.string.kota)) },
+            label = {
+                Text(
+                    text = stringResource(R.string.kota),
+                    color = Orange
+                )
+            },
             singleLine = true,
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Words,
                 imeAction = ImeAction.Next
             ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Orange,
+                unfocusedBorderColor = Orange.copy(alpha = 0.5f)
+            )
         )
         OutlinedTextField(
             value = food,
             onValueChange = { onFoodChange(it) },
-            label = { Text(text = stringResource(R.string.makanan)) },
+            label =
+                { Text(
+                    text = stringResource(R.string.makanan),
+                    color = Orange
+                )
+            },
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences
             ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Orange,
+                unfocusedBorderColor = Orange.copy(alpha = 0.5f)
+            )
         )
         OutlinedTextField(
             value = restaurant,
             onValueChange = { onRestaurantChange(it) },
-            label = { Text(text = stringResource(R.string.resto)) },
+            label = {
+                Text(
+                    text = stringResource(R.string.resto),
+                    color = Orange
+                )
+            },
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences
             ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Orange,
+                unfocusedBorderColor = Orange.copy(alpha = 0.5f)
+            )
         )
         OutlinedCard(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
+            border = BorderStroke(
+                1.dp,
+                Orange
+            )
         ) {
             Column(
                 modifier = Modifier.padding(16.dp)
@@ -232,12 +280,18 @@ fun FormWislist(
                     ) {
                         RadioButton(
                             selected = (text == status),
-                            onClick = null
+                            onClick = null,
+                            colors =
+                                RadioButtonDefaults.colors(
+                                    selectedColor = Orange,
+                                    unselectedColor = Orange.copy(alpha = 0.5f)
+                                )
                         )
                         Text(
                             text = text,
                             style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(start = 16.dp)
+                            modifier = Modifier.padding(start = 16.dp),
+                            color = Orange
                         )
                     }
                 }
