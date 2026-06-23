@@ -15,5 +15,14 @@ data class Wishlist (
     val tanggal: String,
 
     @ColumnInfo(name = "is_deleted")
-    val isDeleted: Boolean = false
+    val isDeleted: Boolean = false,
+
+    @ColumnInfo(name = "image_url")
+    val imageUrl: String? = null,
+
+    @ColumnInfo(name = "local_image_uri")
+    val localImageUri: String? = null,
+
+    @ColumnInfo(name = "is_synced")
+    val isSynced: Boolean = true
 )
