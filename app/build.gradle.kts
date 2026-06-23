@@ -57,9 +57,10 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.gson)
+    implementation(libs.converter.scalars)
+    implementation(libs.converter.moshi)
+    implementation(libs.moshi.kotlin)
     implementation(libs.coil.compose)
-    implementation(libs.androidx.room.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
