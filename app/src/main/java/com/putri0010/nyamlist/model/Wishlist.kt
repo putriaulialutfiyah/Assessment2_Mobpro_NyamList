@@ -44,3 +44,17 @@ data class OpStatus(
     @Json(name = "status") var status: String,
     @Json(name = "message") var message: String?
 )
+
+fun String?.toImageModel(): Any? {
+    val url = this ?: return null
+    return if (url.startsWith("data:image/") && url.contains("base64,")) {
+        val base64Str = url.substringAfter("base64,")
+        try {
+            android.util.Base64.decode(base64Str, android.util.Base64.DEFAULT)
+        } catch (e: Exception) {
+            url
+        }
+    } else {
+        url
+    }
+}

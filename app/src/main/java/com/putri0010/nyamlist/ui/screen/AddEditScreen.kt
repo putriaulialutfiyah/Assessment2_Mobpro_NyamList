@@ -41,6 +41,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.putri0010.nyamlist.R
 import com.putri0010.nyamlist.model.User
+import com.putri0010.nyamlist.model.toImageModel
 import com.putri0010.nyamlist.network.UserDataStore
 import com.putri0010.nyamlist.ui.theme.Cream
 import com.putri0010.nyamlist.ui.theme.NyamListTheme
@@ -241,7 +242,7 @@ fun FormWishlist(
                     )
                 } else if (!existingImageUrl.isNullOrEmpty()) {
                     AsyncImage(
-                        model = existingImageUrl,
+                        model = existingImageUrl.toImageModel(),
                         contentDescription = "Existing Image",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()

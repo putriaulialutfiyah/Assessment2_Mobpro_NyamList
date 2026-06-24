@@ -85,6 +85,7 @@ import com.putri0010.nyamlist.BuildConfig
 import com.putri0010.nyamlist.R
 import com.putri0010.nyamlist.model.User
 import com.putri0010.nyamlist.model.Wishlist
+import com.putri0010.nyamlist.model.toImageModel
 import com.putri0010.nyamlist.navigation.Screen
 import com.putri0010.nyamlist.network.ApiStatus
 import com.putri0010.nyamlist.network.UserDataStore
@@ -140,20 +141,6 @@ fun MainScreen(navController: NavHostController) {
                     }
                 }
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    navController.navigate(Screen.FormBaru.route)
-                },
-                containerColor = Orange
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(id = R.string.tambah_wishlist),
-                    tint = Cream
-                )
-            }
         }
     ) { innerPadding ->
         ScreenContent(showList = showList, modifier = Modifier.padding(innerPadding), navController = navController)
@@ -190,11 +177,11 @@ fun ScreenContent(showList: Boolean, modifier: Modifier = Modifier, navControlle
     LaunchedEffect(user.email, user.idToken) {
         if (user.email.isNotEmpty()) {
             if (user.idToken.isEmpty()) {
-                // If mock user has empty token, automatically set the mock token
+
                 if (user.email == "mockuser@example.com" || user.email.startsWith("mock")) {
                     dataStore.saveData(user.copy(idToken = "mock_token_123"))
                 } else {
-                    // Real user but missing token, sign out to allow fresh login
+
                     dataStore.saveData(User())
                 }
             } else {
@@ -304,7 +291,7 @@ fun ListItem(wishlist: Wishlist, onClick: () -> Unit) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(wishlist.localImageUri ?: wishlist.imageUrl)
+                    .data(wishlist.localImageUri ?: wishlist.imageUrl.toImageModel())
                     .crossfade(true).build(),
                 contentDescription = "Gambar",
                 contentScale = ContentScale.Crop,
@@ -395,7 +382,7 @@ fun GridItem(wishlist: Wishlist, onClick: () -> Unit) {
         Column {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(wishlist.localImageUri ?: wishlist.imageUrl)
+                    .data(wishlist.localImageUri ?: wishlist.imageUrl.toImageModel())
                     .crossfade(true).build(),
                 contentDescription = "Gambar",
                 contentScale = ContentScale.Crop,
