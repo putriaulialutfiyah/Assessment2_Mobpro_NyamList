@@ -14,6 +14,7 @@ import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 private const val BASE_URL = "https://mini-project-3-nyamlist.vercel.app/"
@@ -33,6 +34,12 @@ interface WishlistApiService {
     @GET("api/wishlist")
     suspend fun getWishlist(@Header("Authorization") token: String): List<Wishlist>
 
+    @GET("api/wishlist/{id}")
+    suspend fun getWishlistById(
+        @Header("Authorization") token: String,
+        @Path("id") id: String
+    ): Wishlist
+
     @Multipart
     @POST("api/wishlist")
     suspend fun postWishlist(
@@ -49,6 +56,20 @@ interface WishlistApiService {
     suspend fun deleteWishlist(
         @Header("Authorization") token: String,
         @Path("id") id: String
+    ): OpStatus
+
+    @Multipart
+    @PUT("api/wishlist/{id}")
+    suspend fun putWishlist(
+        @Header("Authorization") token: String,
+        @Path("id") id: String,
+        @Part("kota") kota: RequestBody,
+        @Part("makanan") makanan: RequestBody,
+        @Part("resto") resto: RequestBody,
+        @Part("status") status: RequestBody,
+        @Part("tanggal") tanggal: RequestBody,
+        @Part("is_deleted") isDeleted: RequestBody,
+        @Part image: MultipartBody.Part? = null
     ): OpStatus
 
 }

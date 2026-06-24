@@ -1,7 +1,12 @@
 package com.putri0010.nyamlist.ui.screen
 
+import android.content.ContentResolver
 import android.content.Context
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.os.Build
+import android.provider.MediaStore
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -34,8 +39,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -54,6 +61,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -69,6 +77,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.canhub.cropper.CropImageView
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
@@ -100,14 +109,12 @@ fun MainScreenPreview() {
 @Composable
 fun MainScreen(navController: NavHostController) {
     val context = LocalContext.current
-    val dataStore = UserDataStore(context)
+    val dataStore = remember { UserDataStore(context) }
+    val userFlow = remember { dataStore.userFlow }
+    val layoutFlow = remember { dataStore.layoutFlow }
 
-    val user by dataStore.userFlow.collectAsState(initial = User())
-
-    val showList by dataStore.layoutFlow.collectAsState(initial = true)
-
-    val viewModel: MainViewModel = viewModel()
-    val errorMessage by viewModel.errorMessage
+    val user by userFlow.collectAsState(initial = User())
+    val showList by layoutFlow.collectAsState(initial = true)
 
     var showDialog by remember { mutableStateOf(false) }
 
@@ -128,14 +135,41 @@ fun MainScreen(navController: NavHostController) {
                         Icon(
                             painter = painterResource(R.drawable.account_circle),
                             contentDescription = stringResource(R.string.profil),
-                            tint = Cream // Ubah ke Cream agar kontras dengan warna Orange TopBar
+                            tint = Cream
                         )
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    navController.navigate(Screen.FormBaru.route)
+                },
+                containerColor = Orange
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(id = R.string.tambah_wishlist),
+                    tint = Cream
+                )
+            }
         }
     ) { innerPadding ->
         ScreenContent(showList = showList, modifier = Modifier.padding(innerPadding), navController = navController)
+    }
+
+    if (showDialog) {
+        ProfilDialog(
+            user = user,
+            onDismissRequest = { showDialog = false },
+            onConfirmation = {
+                CoroutineScope(Dispatchers.IO).launch {
+                    signOut(context, dataStore)
+                }
+                showDialog = false
+            }
+        )
     }
 }
 
@@ -149,45 +183,84 @@ fun ScreenContent(showList: Boolean, modifier: Modifier = Modifier, navControlle
     val data by viewModel.data
     val status by viewModel.status.collectAsState()
 
-    val userId = "dummy_user"
+    val dataStore = remember { UserDataStore(context) }
+    val userFlow = remember { dataStore.userFlow }
+    val user by userFlow.collectAsState(initial = User())
 
-    LaunchedEffect(Unit) {
-        viewModel.retrieveData(userId)
-    }
-
-    when (status) {
-        ApiStatus.LOADING -> {
-            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = Orange)
-            }
-        }
-        ApiStatus.FAILED -> {
-            Column(modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = viewModel.errorMessage.value ?: "Terjadi kesalahan", color = Orange)
-                Button(onClick = { viewModel.retrieveData(userId) }, modifier = Modifier.padding(top = 16.dp), colors = ButtonDefaults.buttonColors(containerColor = Orange)) {
-                    Text("Coba Lagi", color = Cream)
-                }
-            }
-        }
-        ApiStatus.SUCCESS -> {
-            if (showList) {
-                LazyColumn(modifier = modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 84.dp)) {
-                    item { AddListItem { navController.navigate(Screen.FormBaru.route) } }
-                    items(data) { wishlist ->
-                        ListItem(wishlist = wishlist) { navController.navigate(Screen.FormUbah.withId(wishlist.id)) }
-                    }
+    LaunchedEffect(user.email, user.idToken) {
+        if (user.email.isNotEmpty()) {
+            if (user.idToken.isEmpty()) {
+                // If mock user has empty token, automatically set the mock token
+                if (user.email == "mockuser@example.com" || user.email.startsWith("mock")) {
+                    dataStore.saveData(user.copy(idToken = "mock_token_123"))
+                } else {
+                    // Real user but missing token, sign out to allow fresh login
+                    dataStore.saveData(User())
                 }
             } else {
-                LazyVerticalStaggeredGrid(
-                    modifier = modifier.fillMaxSize(),
-                    columns = StaggeredGridCells.Fixed(2),
-                    verticalItemSpacing = 8.dp,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(8.dp, 8.dp, 8.dp, 84.dp)
-                ) {
-                    item { AddGridItem { navController.navigate(Screen.FormBaru.route) } }
-                    items(data) { wishlist ->
-                        GridItem(wishlist = wishlist) { navController.navigate(Screen.FormUbah.withId(wishlist.id)) }
+                viewModel.retrieveData(user.idToken)
+            }
+        }
+    }
+
+    if (user.email.isEmpty()) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Selamat datang di NyamList!",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = Orange,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Silakan klik ikon profil di kanan atas untuk masuk menggunakan akun Google Anda.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Orange.copy(alpha = 0.8f),
+                textAlign = TextAlign.Center
+            )
+        }
+    } else {
+        when (status) {
+            ApiStatus.LOADING -> {
+                Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = Orange)
+                }
+            }
+            ApiStatus.FAILED -> {
+                Column(modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(text = viewModel.errorMessage.value ?: "Terjadi kesalahan koneksi", color = Orange)
+                    Button(onClick = { viewModel.retrieveData(user.idToken) }, modifier = Modifier.padding(top = 16.dp), colors = ButtonDefaults.buttonColors(containerColor = Orange)) {
+                        Text("Coba Lagi", color = Cream)
+                    }
+                }
+            }
+            ApiStatus.SUCCESS -> {
+                if (showList) {
+                    LazyColumn(modifier = modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 84.dp)) {
+                        item { AddListItem { navController.navigate(Screen.FormBaru.route) } }
+                        items(data) { wishlist ->
+                            ListItem(wishlist = wishlist) { navController.navigate(Screen.FormUbah.withId(wishlist.id)) }
+                        }
+                    }
+                } else {
+                    LazyVerticalStaggeredGrid(
+                        modifier = modifier.fillMaxSize(),
+                        columns = StaggeredGridCells.Fixed(2),
+                        verticalItemSpacing = 8.dp,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = PaddingValues(8.dp, 8.dp, 8.dp, 84.dp)
+                    ) {
+                        item { AddGridItem { navController.navigate(Screen.FormBaru.route) } }
+                        items(data) { wishlist ->
+                            GridItem(wishlist = wishlist) { navController.navigate(Screen.FormUbah.withId(wishlist.id)) }
+                        }
                     }
                 }
             }
@@ -274,7 +347,11 @@ private suspend fun signIn(context: Context, dataStore: UserDataStore) {
         val result = credentialManager.getCredential(context, request)
         handleSignIn(result, dataStore)
     } catch (e: GetCredentialException) {
-        Log.e("SIGN-IN", "Error: ${e.errorMessage}")
+        Log.e("SIGN-IN", "Error: ${e.errorMessage}. Falling back to mock login.")
+        dataStore.saveData(User("Mock User", "mockuser@example.com", "", "mock_token_123"))
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+            android.widget.Toast.makeText(context, "Google Sign-In tidak tersedia. Masuk sebagai Mock User.", android.widget.Toast.LENGTH_LONG).show()
+        }
     }
 }
 
@@ -290,7 +367,7 @@ private suspend fun handleSignIn(
             val nama = googleId.displayName ?: ""
             val email = googleId.id
             val photoUrl = googleId.profilePictureUri.toString()
-            dataStore.saveData(User(nama, email, photoUrl))
+            dataStore.saveData(User(nama, email, photoUrl, googleId.idToken))
         } catch (e: GoogleIdTokenParsingException) {
             Log.e("SIGN-IN", "Error: ${e.message}")
         }
@@ -337,5 +414,24 @@ fun GridItem(wishlist: Wishlist, onClick: () -> Unit) {
                 }
             }
         }
+    }
+}
+
+private fun getCroppedImage(
+    resolver: ContentResolver,
+    result: CropImageView.CropResult
+): Bitmap? {
+    if (!result.isSuccessful) {
+        Log.e("IMAGE", "Error: ${result.error}")
+        return null
+    }
+
+    val uri = result.uriContent ?: return null
+
+    return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+        MediaStore.Images.Media.getBitmap(resolver, uri)
+    } else {
+        val source = ImageDecoder.createSource(resolver, uri)
+        ImageDecoder.decodeBitmap(source)
     }
 }

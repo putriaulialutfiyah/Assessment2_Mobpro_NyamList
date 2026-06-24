@@ -71,7 +71,7 @@ fun ProfilDialog(
                     modifier = Modifier.size(100.dp)
                 )
                 Text(
-                    text = user.name,
+                    text = user.nama,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold,

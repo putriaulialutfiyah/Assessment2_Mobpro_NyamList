@@ -18,16 +18,18 @@ val Context.dataStore : DataStore<Preferences> by preferencesDataStore(
 class UserDataStore(private val context: Context){
 
     companion object {
-        private val USER_NAME = stringPreferencesKey("name")
+        private val USER_NAME = stringPreferencesKey("nama")
         private val USER_EMAIL = stringPreferencesKey("email")
         private val USER_PHOTO = stringPreferencesKey("photoUrl")
+        private val USER_TOKEN = stringPreferencesKey("idToken")
         private val LAYOUT_KEY = booleanPreferencesKey("layout_setting") // Kunci untuk grid/list
     }
     val userFlow: Flow<User> = context.dataStore.data.map { preferences ->
         User(
-            name = preferences[USER_NAME] ?: "",
+            nama = preferences[USER_NAME] ?: "",
             email = preferences[USER_EMAIL] ?: "",
-            photoUrl = preferences[USER_PHOTO] ?: ""
+            photoUrl = preferences[USER_PHOTO] ?: "",
+            idToken = preferences[USER_TOKEN] ?: ""
         )
     }
 
@@ -37,9 +39,10 @@ class UserDataStore(private val context: Context){
 
     suspend fun saveData(user: User) {
         context.dataStore.edit { preferences ->
-            preferences[USER_NAME] = user.name
+            preferences[USER_NAME] = user.nama
             preferences[USER_EMAIL] = user.email
             preferences[USER_PHOTO] = user.photoUrl
+            preferences[USER_TOKEN] = user.idToken
         }
     }
 
